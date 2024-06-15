@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!--- head 외부 파일 포함-->
+    <%- include('partials/head') %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Wallet</title>
+</head>
+<body>
+    <!--바디 해드영역-->
+    <header>
+        <%- include('partials/header') %>
+    </header>
+    <!---바디 컨텐츠영역-->
+    <div class = "container">
+        <div class = "title">
+            Message: <p id = "message"><%= message %></p>
+        </div>
+        <div class = "subtitle">
+            BlockNumber: <p id="blockNumber"><%= blockNumber %></p>
+        </div>
+        <div class = "frame active">
+            <div class = "title">
+                Update Message
+            </div>
+            <div class = "contents">
+                Sender : <select id = "selSender">
+                    <% for(let i = 0; i < accounts.length; i++) { %>
+                        <option value="<%= i %>"><%= accounts[i] %></option>
+                    <% } %>
+                </select>
+                <div>
+                    Message: <input type="text" id = "inputMessage" class ="input-box" placeholder="Hi">
+                </div>
+                <div>
+                    <button id = "btnUpdateMessage">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--- 바디 푸터영역-->
+    <footer>
+        <%- include('partials/footer') %>
+    </footer>
+</body>
+<script>
+    // 버튼이 눌러졌을때
+    // 서버에 /hello-world/message, PUT 요청 보내기
+    // 블록넘버와 메세지 업데이트
+    document.getElementById("btnUpdateMessage").addEventListener('click', event => {
+        // 1. document 의 속성값이나 엘리먼트 객체 가져오기
+        const selSender = document.getElementById("selSender");
+        const sender = selSender.options[selSender.selectedIndex].text;
+        const inputMessage = document.getElementById("inputMessage");
+        const newMessage = inputMessage.value;
+        // 값 업데이트를 위해 객체를 가져오기 해놓음
+        const message = document.getElementById("message");
+        const blockNumber = document.getElementById("blockNumber");
+        // 2. 서버로 PUT요청 보내기
+        fetch("/hello-world/message", {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ sender, newMessage })
+        })
+        .then(response => response.json())
+        .then(json => {
+            // 3. 응답을 받아서 페이지 업데이트하기
+            console.log(json.messge, json.blockNumber);''
+            message.innerHTML = json.message;
+            blockNumber.innerHTML = json.blockNumber;
+            inputMessage.value = "";
+        });
+
+    });
+</script>
+</html>
